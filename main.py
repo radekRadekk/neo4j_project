@@ -203,7 +203,8 @@ def load_matches(session):
 
 
 def print_n_biggest_tournaments(tx, n):
-    query = "MATCH (m:Match)-[:IN_TOURNAMENT]->(t:Tournament) RETURN t.name, t.year, count(m) AS matches_count ORDER BY matches_count DESC LIMIT $n"
+    query = "MATCH (m:Match)-[:IN_TOURNAMENT]->(t:Tournament) RETURN " + \
+            "t.name, t.year, count(m) AS matches_count ORDER BY matches_count DESC LIMIT $n"
     for record in tx.run(query, n=n):
         print(f'{record[0]} - {record[1]} - {record[2]}')
 
@@ -213,7 +214,9 @@ def execute_print_n_biggest_tournaments(session, n):
 
 
 def print_players_with_many_teams(tx):
-    query = "MATCH (p:Player)-[:MEMBER_IN]->(t:Team) WITH p.name AS player_name, count(t) AS team_num WHERE team_num > 1 RETURN player_name, team_num ORDER BY team_num DESC"
+    query = "MATCH (p:Player)-[:MEMBER_IN]->(t:Team) " + \
+            "WITH p.name AS player_name, count(t) AS team_num WHERE team_num > 1 " + \
+            "RETURN player_name, team_num ORDER BY team_num DESC"
     for record in tx.run(query):
         print(f'{record[0]} - {record[1]}')
 
@@ -223,8 +226,10 @@ def execute_print_players_with_many_teams(session):
 
 
 def print_winners_in_age_range(tx, from_years, to_years):
-    query = 'MATCH (p:Player)-[:MEMBER_IN]->(t:Team)-[:WIN]->(m:Match) WHERE datetime(m.date) - duration({years: $from_years}) >= datetime(p.birthdate) ' + \
-            'AND datetime(m.date) - duration({years: $to_years}) < datetime(p.birthdate) RETURN DISTINCT p.name'
+    query = 'MATCH (p:Player)-[:MEMBER_IN]->(t:Team)-[:WIN]->(m:Match) ' + \
+            'WHERE datetime(m.date) - duration({years: $from_years}) >= datetime(p.birthdate) ' + \
+            'AND datetime(m.date) - duration({years: $to_years}) < datetime(p.birthdate) ' +\
+            'RETURN DISTINCT p.name'
     for record in tx.run(query, from_years=from_years, to_years=to_years):
         print(f'{record[0]}')
 
